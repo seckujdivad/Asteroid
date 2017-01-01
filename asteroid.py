@@ -17,8 +17,9 @@ class settings:
     class asteroids:
         use_multithreading = True
         difficulty_increment = 3 #Bigger number means that the game takes longer to progress
-        fps_smoothing = 20 #Data cap - bigger number means more smoothing
+        fps_smoothing = 30 #Data cap - bigger number means more smoothing
         clip = True
+        fps_decimals = 0
     class laser:
         flash = 0.05
         times = 3
@@ -166,6 +167,8 @@ class scripts:
                 class alerts:
                     warning = None
                     counter = None
+            while None in (scripts.game.ship_x, scripts.game.ship_y):
+                pass
             while True:
                 frame.start = time.time()
                 if len(asteroids) < (score / settings.asteroids.difficulty_increment) + 4: #Cap asteroids
@@ -234,7 +237,7 @@ class scripts:
                         colour = 'yellow'
                     else:
                         colour = 'red'
-                    my_fps = str(round(average, 2))
+                    my_fps = str(round(average, settings.asteroids.fps_decimals))
                 except ZeroDivisionError:
                     my_fps = 'HIGH' #Apparently - the loop took 0 seconds - this has happened, so this is my error catching
                     colour = 'green'
@@ -366,10 +369,10 @@ class graphics:
                 thread.start()
                 graphics.mouse.left_x = event.x
                 graphics.mouse.left_y = event.y
-        x = None
-        y = None
-        left_x = None
-        left_y = None
+        x = 0
+        y = 0
+        left_x = 0
+        left_y = 0
     sprites = []
 
 root.bind('<Button-1>', graphics.mouse.down)
