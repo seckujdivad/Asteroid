@@ -16,7 +16,7 @@ score = 0
 class settings:
     class asteroids:
         use_multithreading = True
-        difficulty_increment = 3 #Bigger number means that the game takes longer to progress
+        difficulty_increment = 3 #Bigger number means that the game takes longer to get more difficult
         fps_smoothing = 30 #Data cap - bigger number means more smoothing
         clip = True
         fps_decimals = 0
@@ -46,6 +46,8 @@ class scripts:
             if button_centre[0] - 50 < event.x < button_centre[0] + 50 and button_centre[1] - 20 < event.y < button_centre[1] + 20:
                 scene = 'game'
                 graphics(['background', 'start'])
+        def right_mouse(event):
+            pass
     class game:
         def __init__(self):
             global thread_refs
@@ -98,6 +100,8 @@ class scripts:
                     time.sleep(settings.laser.flash)
                     canvas.delete(laser)
                     time.sleep(settings.laser.flash)
+        def close():
+            time.sleep(0.5)
         def move_ship_to(f_x, f_y):
             try:
                 global scripts
@@ -169,7 +173,7 @@ class scripts:
                     counter = None
             while None in (scripts.game.ship_x, scripts.game.ship_y):
                 pass
-            while True:
+            while scene == 'game':
                 frame.start = time.time()
                 if len(asteroids) < (score / settings.asteroids.difficulty_increment) + 4: #Cap asteroids
                     class new_asteroid:
@@ -237,7 +241,10 @@ class scripts:
                         colour = 'yellow'
                     else:
                         colour = 'red'
-                    my_fps = str(round(average, settings.asteroids.fps_decimals))
+                    my_fps = round(average, settings.asteroids.fps_decimals)
+                    if settings.asteroids.fps_decimals < 1: #Remove decimal place when none should be showing
+                        my_fps = int(my_fps)
+                    my_fps = str(my_fps)
                 except ZeroDivisionError:
                     my_fps = 'HIGH' #Apparently - the loop took 0 seconds - this has happened, so this is my error catching
                     colour = 'green'
@@ -251,7 +258,7 @@ class scripts:
             global score
             oldscore = score + 1 #Make sure that they are different
             scoreboard_image = None
-            while True:
+            while scene == 'game':
                 while oldscore == score: #until not statement
                     time.sleep(0.1) #pass drains CPU (I think because it is too fast and has to check the condition loads) - this doesn't
                 oldscore = score
@@ -287,7 +294,7 @@ class scripts:
             global scripts
             old_level = scripts.game.powerup_level + 1
             image = canvas.create_rectangle(10, canvas_cfg.height - 10, 10 + scripts.game.powerup_level, canvas_cfg.height - 10, fill='red', outline='red')
-            while True:
+            while scene == 'game':
                 if scripts.game.powerup_level < 50:
                     scripts.game.powerup_level = scripts.game.powerup_level + 1
                 old_level = scripts.game.powerup_level
@@ -304,7 +311,7 @@ class scripts:
             global scripts
             old_level = scripts.game.health + 1
             image = canvas.create_rectangle(10, canvas_cfg.height - 20, 10 + scripts.game.health, canvas_cfg.height - 20, fill='red', outline='red')
-            while True:
+            while scene == 'game':
                 while old_level == scripts.game.health:
                     time.sleep(0.1)
                 old_level = scripts.game.health
@@ -330,6 +337,17 @@ class scripts:
         last_clip = None
         powerup_level = 0
         health = 5
+    class end:
+        def __init__(self):
+            pass
+        def background():
+            pass
+        def mouse(event):
+            pass
+        def right_mouse(event):
+            pass
+        def close():
+            pass
 
 end = False
 scenes = {'game':{'background':'#ff8742',
@@ -381,6 +399,8 @@ root.bind('<Button-3>', graphics.mouse.left_down)
 graphics(['background', 'start'])
 
 root.mainloop()
+
+scene = None
 
 for thread in thread_refs: #Unfortunately doesn't do anything
     pass #thread.close()
